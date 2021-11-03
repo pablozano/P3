@@ -1,0 +1,5 @@
+/build
+/__MAC*
+/pitch_db/test
+*DS_Store
+*Zone.Identifier
