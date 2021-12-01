@@ -1,5 +1,9 @@
-/build
-/__MAC*
-/pitch_db
-*DS_Store
-*Zone.Identifier
+/*/
+
+!/__MAC*/
+!/graphs/
+!/img/
+!/mis_datos/
+!/pitch_db/
+!/scripts/
+!/src/

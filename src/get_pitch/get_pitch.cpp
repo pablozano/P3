@@ -25,8 +25,12 @@ Usage:
     get_pitch --version
 
 Options:
-    -h, --help  Show this screen
-    --version   Show the version of the project
+    -0 FLOAT, --k0=FLOAT      Umbral potencia en dB [default: -18]
+    -1 FLOAT, --k1=FLOAT      Umbral para autocorrelación r1norm [default: 0.5]
+    -2 FLOAT, --k2=FLOAT      Umbral para autocorrelación rmaxnorm [default: 0.4]  
+    -c FLOAT, --clip=FLOAT    Umbral para center clipping [default: 0.0001]
+    -h, --help                Show this screen
+    --version                 Show the version of the project
 
 Arguments:
     input-wav   Wave file with the audio signal
@@ -39,6 +43,7 @@ int main(int argc, const char *argv[]) {
 	/// \TODO 
 	///  Modify the program syntax and the call to **docopt()** in order to
 	///  add options and arguments to the program.
+  /// \DONE
     std::map<std::string, docopt::value> args = docopt::docopt(USAGE,
         {argv + 1, argv + argc},	// array of arguments, without the program name
         true,    // show help if requested
@@ -46,6 +51,12 @@ int main(int argc, const char *argv[]) {
 
 	std::string input_wav = args["<input-wav>"].asString();
 	std::string output_txt = args["<output-txt>"].asString();
+  float k0 = stof(args["--k0"].asString());
+  float k1 = stof(args["--k1"].asString());
+  float k2 = stof(args["--k2"].asString());
+  float clip = stof(args["--clip"].asString());
+
+
 
   // Read input sound file
   unsigned int rate;
@@ -59,11 +70,21 @@ int main(int argc, const char *argv[]) {
   int n_shift = rate * FRAME_SHIFT;
 
   // Define analyzer
-  PitchAnalyzer analyzer(n_len, rate, PitchAnalyzer::HAMMING, 50, 500);
+  PitchAnalyzer analyzer(n_len, rate, k0, k1, k2, PitchAnalyzer::RECT, 50, 500);
 
   /// \TODO
   /// Preprocess the input signal in order to ease pitch estimation. For instance,
   /// central-clipping or low pass filtering may be used.
+  /// \DONE
+  unsigned int i;
+  for (i = 0; i < x.size(); i++){
+    if (x[i] > clip)
+      x[i] = x[i] - clip;
+    else if (x[i] < -1 * clip)
+      x[i] = x[i] + clip;
+    else
+      x[i] = 0;
+  }
   
   // Iterate for each frame and save values in f0 vector
   vector<float>::iterator iX;
@@ -76,6 +97,15 @@ int main(int argc, const char *argv[]) {
   /// \TODO
   /// Postprocess the estimation in order to supress errors. For instance, a median filter
   /// or time-warping may be used.
+  /// \DONE
+  for (i = 1; i < f0.size()-1; i++){
+    vector<float> aux;
+    aux.push_back(f0[i-1]);
+    aux.push_back(f0[i]);
+    aux.push_back(f0[i+1]);
+    std::sort (aux.begin(), aux.end());
+    f0[i] = aux[1];
+  }
 
   // Write f0 contour into the output file
   ofstream os(output_txt);
