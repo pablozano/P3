@@ -17,22 +17,20 @@ Ejercicios básicos
 
 	> A continuación se presenta el código de la autocorrelación:
 
-	> ```cpp
- 	> void PitchAnalyzer::autocorrelation(const vector<float> &x, vector<float> &r) const {
-	>
-    	> 	for (unsigned int l = 0; l < r.size(); ++l) {
-  	>		/// \TODO Compute the autocorrelation r[l]
-      	> 		/// \DONE Autocorrelation r[l] computed
-      	> 		r[l] = 0;
-      	>		for (unsigned int n = l; n < x.size(); n++){
-        >			r[l] += x[n-l]*x[n];
-      	>		}
-    	> 	}
-	>
-    	> 	if (r[0] == 0.0F) //to avoid log() and divide zero 
-      	> 		r[0] = 1e-10; 
-  	> 	}
-	> ```
+	```cpp
+ 	void PitchAnalyzer::autocorrelation(const vector<float> &x, vector<float> &r) const {
+    		for (unsigned int l = 0; l < r.size(); ++l) {
+  			/// \TODO Compute the autocorrelation r[l]
+      			/// \DONE Autocorrelation r[l] computed
+      			r[l] = 0;
+      			for (unsigned int n = l; n < x.size(); n++){
+        			r[l] += x[n-l]*x[n];
+      			}
+    		}
+		if (r[0] == 0.0F) //to avoid log() and divide zero 
+      			r[0] = 1e-10; 
+  		}
+	```
 
    * Inserte una gŕafica donde, en un *subplot*, se vea con claridad la señal temporal de un segmento de
      unos 30 ms de un fonema sonoro y su periodo de pitch; y, en otro *subplot*, se vea con claridad la
@@ -46,54 +44,54 @@ Ejercicios básicos
 	>
 	> Para nuestro código en Python, primero importamos las librerías necesarias: *matplotlib* y *soundfile*.
 	> El código es el siguiente:
-	>
-	> ```py
-	> # Imports
-	> import numpy as np
-	> import matplotlib.pyplot as plt
-	> import matplotlib.gridspec as gridspec
-	> import soundfile as sf
-	>
-	> signal, fm = sf.read('rl002.wav') # Usamos señal rl002
-	> t = np.arange(0, len(signal)) / fm 
-	>
-	> t_ms = 30                 # 30 ms
-	> l = int((fm * t_ms)/1e3)  # 'l' muestras
-	>
-	> def autocorrelacion(vector):
-    	>	autocorrelation = np.correlate(vector, vector, mode = 'full')
-    	>	return autocorrelation[autocorrelation.size//2:]
-	>
-	> # Create 2x2 sub plots
-	> gs = gridspec.GridSpec(2, 2)
-	>
-	> plt.figure()
-	> ax = plt.subplot(gs[0, 0]) # row 0, col 0
-	> plt.plot(t, signal)
-	> plt.title('Señal completa (rl002)', fontweight = 'bold')
-	> plt.xlabel('s', fontsize = 10)
-	> plt.ylabel('Amplitud', fontsize = 10)
-	>
-	> ax = plt.subplot(gs[0, 1]) # row 0, col 1
-	> plt.plot(t[fm:fm+l], signal[fm:fm+l])
-	> plt.title('Señal recortada (30ms)', fontweight = 'bold')
-	> plt.xlabel('Muestras', fontsize = 10)
-	> plt.ylabel('Amplitud', fontsize = 10)
-	>
-	> ax = plt.subplot(gs[1, :]) # row 1, span all columns
-	> plt.plot(t[:l]*1000, autocorrelacion(signal[fm:fm+l]))
-	> plt.title('Autocorrelación', fontweight = 'bold')
-	> plt.xlabel('n', fontsize = 10)
-	> plt.ylabel('Amplitud', fontsize = 10)
-	>
-	> plt.tight_layout()
-	> plt.show()
-	> ```
-	>
+
+	```py
+	# Imports
+	import numpy as np
+	import matplotlib.pyplot as plt
+	import matplotlib.gridspec as gridspec
+	import soundfile as sf
+	
+	signal, fm = sf.read('rl002.wav') # Usamos señal rl002
+	t = np.arange(0, len(signal)) / fm 
+
+	t_ms = 30                 # 30 ms
+	l = int((fm * t_ms)/1e3)  # 'l' muestras
+
+	def autocorrelacion(vector):
+    		autocorrelation = np.correlate(vector, vector, mode = 'full')
+    		return autocorrelation[autocorrelation.size//2:]
+	
+	# Create 2x2 sub plots
+	gs = gridspec.GridSpec(2, 2)
+	
+	plt.figure()
+	ax = plt.subplot(gs[0, 0]) # row 0, col 0
+	plt.plot(t, signal)
+	plt.title('Señal completa (rl002)', fontweight = 'bold')
+	plt.xlabel('s', fontsize = 10)
+	plt.ylabel('Amplitud', fontsize = 10)
+
+	ax = plt.subplot(gs[0, 1]) # row 0, col 1
+	plt.plot(t[fm:fm+l], signal[fm:fm+l])
+	plt.title('Señal recortada (30ms)', fontweight = 'bold')
+	plt.xlabel('Muestras', fontsize = 10)
+	plt.ylabel('Amplitud', fontsize = 10)
+	
+	ax = plt.subplot(gs[1, :]) # row 1, span all columns
+	plt.plot(t[:l]*1000, autocorrelacion(signal[fm:fm+l]))
+	plt.title('Autocorrelación', fontweight = 'bold')
+	plt.xlabel('n', fontsize = 10)
+	plt.ylabel('Amplitud', fontsize = 10)
+
+	plt.tight_layout()
+	plt.show()
+	```
+	
 	> **Nota:** este código, junto al resto de códigos de Python empleados para realizar las distintas 
 	> gráficas pedidas en esta práctica, se pueden encontrar en el repositorio **graphs** dentro de **P3**.
 	>
-	> <img src="img/python_corr.png" width="800" align="center">
+	> <img src="img/python_corr.PNG" width="800" align="center">
 
    * Determine el mejor candidato para el periodo de pitch localizando el primer máximo secundario de la
      autocorrelación. Inserte a continuación el código correspondiente.
@@ -101,74 +99,71 @@ Ejercicios básicos
 	> Para encontrar la diferencia (lag), debemos hacer la resta entre el origen y el primer máximo secundario 
 	> de la autocorrelación. Si trabajamos con una trama sorda, no podremos obtener el pitch, por lo que devolvemos
 	> un 0. Sin embargo, cuando trabajamos con una trama sonora, devolveremos su pitch. El código es el siguiente:
-	>
-	>```cpp
-	>  float PitchAnalyzer::compute_pitch(vector<float> & x) const {
-    	> 	if (x.size() != frameLen)
-      	>		return -1.0F;
-	>
-    	> 	//Window input frame
-    	> 	for (unsigned int i=0; i<x.size(); ++i)
-      	> 		x[i] *= window[i];
-	>
-    	> 	vector<float> r(npitch_max);
-	>
-  	> 	//Compute correlation
-    	> 	autocorrelation(x, r);
-	>
-    	> 	vector<float>::const_iterator iR = r.begin(), iRMax = r.begin() + npitch_min;
-	>
-    	> 	/// \TODO 
-	> 	/// Find the lag of the maximum value of the autocorrelation away from the origin.<br>
-	> 	/// Choices to set the minimum value of the lag are:
-	> 	///    - The first negative value of the autocorrelation.
-	> 	///    - The lag corresponding to the maximum value of the pitch.
-    	> 	///	   .
-	> 	/// In either case, the lag should not exceed that of the minimum value of the pitch.
-  	> 	/// \DONE
-    	> 	for(iR = r.begin() + npitch_min; iR < r.begin() + npitch_max; iR++){
-      	> 		if(*iR > *iRMax){
-        > 			iRMax = iR;
-      	> 		}
-    	> 	}
-	>
-    	> 	unsigned int lag = iRMax - r.begin();
-	>
-    	> 	float pot = 10 * log10(r[0]);
-	>
-    	> 	//You can print these (and other) features, look at them using wavesurfer
-    	> 	//Based on that, implement a rule for unvoiced
-    	> 	//change to #if 1 and compile
-	> #if 1
-    	> 	if (r[0] > 0.0F)
-      	>		cout << pot << '\t' << r[1]/r[0] << '\t' << r[lag]/r[0] << endl;
-	> #endif
-   	> 
-    	> 	if (unvoiced(pot, r[1]/r[0], r[lag]/r[0]))
-      	>		return 0;
-    	> 	else
-      	> 		return (float) samplingFreq/(float) lag;
-  	>  }
-	> ```
+
+	```cpp
+	float PitchAnalyzer::compute_pitch(vector<float> & x) const {
+    	if (x.size() != frameLen)
+    		return -1.0F;
+
+  	//Window input frame
+    	for (unsigned int i=0; i<x.size(); ++i)
+      		x[i] *= window[i];
+	
+    	vector<float> r(npitch_max);
+	
+  	//Compute correlation
+    	autocorrelation(x, r);
+	
+    	vector<float>::const_iterator iR = r.begin(), iRMax = r.begin() + npitch_min;
+	
+    	/// \TODO 
+	/// Find the lag of the maximum value of the autocorrelation away from the origin.<br>
+	/// Choices to set the minimum value of the lag are:
+	///    - The first negative value of the autocorrelation.
+	///    - The lag corresponding to the maximum value of the pitch.
+    	///	   .
+	/// In either case, the lag should not exceed that of the minimum value of the pitch.
+  	/// \DONE
+    	for(iR = r.begin() + npitch_min; iR < r.begin() + npitch_max; iR++){
+      		if(*iR > *iRMax){
+        		iRMax = iR;
+      		}
+    	}
+	
+    	unsigned int lag = iRMax - r.begin();
+	float pot = 10 * log10(r[0]);
+	
+  	//You can print these (and other) features, look at them using wavesurfer
+    	//Based on that, implement a rule for unvoiced
+    	//change to #if 1 and compile
+	#if 1
+    		if (r[0] > 0.0F)
+      			cout << pot << '\t' << r[1]/r[0] << '\t' << r[lag]/r[0] << endl;
+	#endif
+   	 
+    	if (unvoiced(pot, r[1]/r[0], r[lag]/r[0]))
+      		return 0;
+    	else
+      		return (float) samplingFreq/(float) lag;
+	```
 
    * Implemente la regla de decisión sonoro o sordo e inserte el código correspondiente.
 
-	> ```cpp
-	> bool PitchAnalyzer::unvoiced(float pot, float r1norm, float rmaxnorm) const {
-    	>	/// \TODO Implement a rule to decide whether the sound is voiced or not.
-    	>	/// * You can use the standard features (pot, r1norm, rmaxnorm),
-    	>	///   or compute and use other ones.
-    	>	/// \DONE
-    	>	if (pot < -23 || r1norm < 0.5 || rmaxnorm < 0.4)
-      	>		return true;
-    	>	else
-      	>		return true;
-  	> }
-	> ```
-	>
+	```cpp
+	bool PitchAnalyzer::unvoiced(float pot, float r1norm, float rmaxnorm) const {
+    	/// \TODO Implement a rule to decide whether the sound is voiced or not.
+    	/// * You can use the standard features (pot, r1norm, rmaxnorm),
+    	///   or compute and use other ones.
+    	/// \DONE
+    	if (pot < -23 || r1norm < 0.5 || rmaxnorm < 0.4)
+      		return true;
+    	else
+      		return true;
+	```
+	
 	> Con estos parámetros, **que ya han sido *ligeramente* optimizados**, obtenemos un resultado total del 90.51%:
 	>
-	> <img src="img/Primer_Score.png" width="800" align="center">
+	> <img src="img/Primer_Score.PNG" width="800" align="center">
 	>
 	> **Nota:** en el siguiente apartado se discutirán las caracterísitcas que nos interesan de estos tres parámetros.
 
@@ -190,7 +185,7 @@ Ejercicios básicos
 
 	> Las gráficas obtenidas con el audio **rl002.wav** son las siguientes:
 	>
-	> <img src="img/wavesurfer_param.png" width="800" align="center">
+	> <img src="img/wavesurfer_param.PNG" width="800" align="center">
 	>
 	> En estas gráficas se muestra la **potencia** en dB, la *autocorrelación normalizada en 1* y la 
 	> **autocorrelación normalizada en el primer máximo secundario**, que son los parámetros que usamos para
@@ -229,7 +224,7 @@ Ejercicios básicos
 	>
 	> Las tasas de error obtenidas son las siguientes:
 	>
-	> <img src="img/Segundo_Score.png" width="800" align="center">
+	> <img src="img/Segundo_Score.PNG" width="800" align="center">
 	
 
    * Inserte una gráfica en la que se vea con claridad el resultado de su detector de pitch junto al del
@@ -238,50 +233,50 @@ Ejercicios básicos
 
 	> En *WaveSurfer*:
 	>
-	> <img src="img/wavesurfer_compara.png" width="800" align="center">
+	> <img src="img/wavesurfer_compara.PNG" width="800" align="center">
 	>
 	> En *Python*:
 	>
-	> <img src="img/python_compara.png" width="800" align="center">	
+	> <img src="img/python_compara.PNG" width="800" align="center">	
 	>
 	> El código empleado para estas gráficas se muestra a continuación:
-	>
-	>```py
-	> # Imports 
-	> import numpy as np
-	> import matplotlib.pyplot as plt
-	> import matplotlib.gridspec as gridspec
-	> 
-	> pitch_programa = np.loadtxt('pitch_programa.f0')
-	> pitch_wave = np.loadtxt('pitch_wave.f0')
-	>
-	> # Create 2x2 sub plots
-	> gs = gridspec.GridSpec(2, 2)
-	>
-	> plt.figure()
-	> ax = plt.subplot(gs[0, 0]) # row 0, col 0
-	> plt.plot(pitch_programa, '8', c='blue', markersize = 1)
-	> plt.title('Pitch Programa', fontweight = 'bold')
-	> plt.xlabel('s', fontsize = 10)
-	> plt.ylabel('Hz', fontsize = 10)
-	>
-	> ax = plt.subplot(gs[0, 1]) # row 0, col 1
-	> plt.plot(pitch_wave, 'D', c='red', markersize = 1)
-	> plt.title('Pitch WaveSurfer', fontweight = 'bold')
-	> plt.xlabel('s', fontsize = 10)
-	> plt.ylabel('Hz', fontsize = 10)
-	>
-	> ax = plt.subplot(gs[1, :]) # row 1, span all columns
-	> plt.plot(pitch_programa, '8', c='blue', markersize = 1)
-	> plt.plot(pitch_wave, 'D', c='red', markersize = 1)
-	> plt.title('Programa vs Wave', fontweight = 'bold')
-	> plt.xlabel('s', fontsize = 10)
-	> plt.ylabel('Hz', fontsize = 10)
-	>
-	> plt.tight_layout()
-	> plt.show()
-	> ```
-	>
+
+	```py
+	# Imports 
+	import numpy as np
+	import matplotlib.pyplot as plt
+	import matplotlib.gridspec as gridspec
+	 
+	pitch_programa = np.loadtxt('pitch_programa.f0')
+	pitch_wave = np.loadtxt('pitch_wave.f0')
+	
+	# Create 2x2 sub plots
+	gs = gridspec.GridSpec(2, 2)
+	
+	plt.figure()
+	ax = plt.subplot(gs[0, 0]) # row 0, col 0
+	plt.plot(pitch_programa, '8', c='blue', markersize = 1)
+	plt.title('Pitch Programa', fontweight = 'bold')
+	plt.xlabel('s', fontsize = 10)
+	plt.ylabel('Hz', fontsize = 10)
+	
+	ax = plt.subplot(gs[0, 1]) # row 0, col 1
+	plt.plot(pitch_wave, 'D', c='red', markersize = 1)
+	plt.title('Pitch WaveSurfer', fontweight = 'bold')
+	plt.xlabel('s', fontsize = 10)
+	plt.ylabel('Hz', fontsize = 10)
+	
+	ax = plt.subplot(gs[1, :]) # row 1, span all columns
+	plt.plot(pitch_programa, '8', c='blue', markersize = 1)
+	plt.plot(pitch_wave, 'D', c='red', markersize = 1)
+	plt.title('Programa vs Wave', fontweight = 'bold')
+	plt.xlabel('s', fontsize = 10)
+	plt.ylabel('Hz', fontsize = 10)
+	
+	plt.tight_layout()
+	plt.show()
+	```
+	
 	> **Nota:** en *get_pitch* hemos modificado *#define FRAME_SHIFT 0.015* a *#define FRAME_SHIFT **0.010***
 	> para que en la tercera gráfica saliera bien la superposición de ambos pitches.
 	   
@@ -302,12 +297,12 @@ Ejercicios de ampliación
 	> El mensaje de ayuda, *antes* de aplicar las posibles mejoras (concretamente el *center clipping*), 
 	> es el siguiente:
 	>
-	> <img src="img/get_pitch_help.png" width="800" align="center">
+	> <img src="img/get_pitch_help.PNG" width="800" align="center">
 	>
 	> En la siguiente captura se muestra el uso de docopt para modificar el valor de los parámetros desde el 
 	> *bash*. Hemos usado una potencia de **-5** para mostrar la caída en el porcentaje.
 	>
-	> <img src="img/docopt_ajustando_param.png" width="800" align="center">
+	> <img src="img/docopt_ajustando_param.PNG" width="800" align="center">
 
 - Implemente las técnicas que considere oportunas para optimizar las prestaciones del sistema de detección
   de pitch.
@@ -339,43 +334,43 @@ Ejercicios de ampliación
 	> (**clip**) en el *docopt*.
 	>
 	> El código del *center clipping* es el siguiente:
-	>
-	> ```cpp
-	>  int i;
-  	> for (i = 0; i < x.size(); i++){
-    	> 	if (x[i] > clip)
-      	>		x[i] = x[i] - clip;
-    	>	else if (x[i] < -1 * clip)
-      	>		x[i] = x[i] + clip;
-    	>	else
-      	>		x[i] = 0;
-  	> }
-	> ```
-	>
+
+	```cpp
+	int i;
+  	for (i = 0; i < x.size(); i++){
+    		if (x[i] > clip)
+      			x[i] = x[i] - clip;
+    		else if (x[i] < -1 * clip)
+      			x[i] = x[i] + clip;
+    		else
+      			x[i] = 0;
+  	}
+	```
+	
 	> Como técnica de postprocesado se ha implementado el *filtro de mediana* de longitud 3. Con este filtrado 
 	> conseguimos disminuir los *gross errors*. 
 	>
 	> El código del *filtro de mediana* es el siguiente:
-	>
-	> ```cpp
-	> for (i = 1; i < f0.size()-1; i++){
-    	> 	vector<float> aux;
-    	>	aux.push_back(f0[i-1]);
-    	>	aux.push_back(f0[i]);
-    	>	aux.push_back(f0[i+1]);
-    	>	std::sort (aux.begin(), aux.end());
-    	>	f0[i] = aux[1];
-	> }
-	> ```
-	>
+	
+	```cpp
+	for (i = 1; i < f0.size()-1; i++){
+    		vector<float> aux;
+    		aux.push_back(f0[i-1]);
+    		aux.push_back(f0[i]);
+    		aux.push_back(f0[i+1]);
+    		std::sort (aux.begin(), aux.end());
+    		f0[i] = aux[1];
+	}
+	```
+	
 	> Con estas mejoras y una nueva optimización de los parámetros del detector, concretamente con **clip** = 0.0001, 
 	> obtenemos las siguientes tasas de error finales:
 	>
-	> <img src="img/Tercer_Score.png" width="800" align="center">
+	> <img src="img/Tercer_Score.PNG" width="800" align="center">
 	>
 	> Si volvemos a compara el pitch de *WaveSurfer* con el nuevo pitch optimizado, obtenemos la siguiente gráfica:
 	>
-	> <img src="img/python_compara_opti.png" width="800" align="center">
+	> <img src="img/python_compara_opti.PNG" width="800" align="center">
    
 
 Evaluación *ciega* del detector
@@ -387,7 +382,7 @@ para compilar los programas correctamente ejecutando `make release`.
 	> **Nota:** en el pull request sólo deberán figurar los archivos necesarios para evaluar el trabajo realizado. 
 	> Para ello, editamos el fichero *.giignore*:
 	>
-	> <img src="img/gitignore.png" width="800" align="center">
+	> <img src="img/gitignore.PNG" width="800" align="center">
 	>
 	> La primera línea de *.gitignore* indica que no debe realizarse el seguimiento de ningún subdirectorio del 
 	> proyecto. Por otro lado, las otras líneas que vienen a continuación indican que el directorio especificado 
